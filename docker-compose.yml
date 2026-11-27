@@ -1,0 +1,14 @@
+# Synology Container Manager → Progetto → Crea, con questa cartella come percorso.
+services:
+  vtt:
+    build: .
+    image: vtt:latest
+    container_name: vtt
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      TZ: Europe/Rome
+    volumes:
+      # database SQLite e immagini caricate: sopravvivono agli aggiornamenti dell'immagine
+      - ./data:/data

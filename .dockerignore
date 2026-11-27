@@ -1,0 +1,12 @@
+**/node_modules
+**/dist
+data
+coverage
+.git
+.claude
+docs
+plans
+*.log
+.DS_Store
+TODO.md
+docker-compose.yml

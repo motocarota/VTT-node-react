@@ -43,6 +43,26 @@ pnpm prod logs      # segue il log
 - Al primo avvio macOS può chiedere se consentire a `node` le connessioni in entrata: va accettato, altrimenti il firewall blocca i dispositivi in rete.
 - L'istanza non riparte da sola dopo un riavvio del Mac: `pnpm prod start`.
 
+## Deploy su NAS Synology (Docker)
+
+L'immagine (`Dockerfile`) contiene solo Node 24, il server in un unico bundle e il client compilato: la versione di Node installata sul NAS non conta. Serve **Container Manager** (Centro pacchetti, DSM 7.2+).
+
+1. Sul Mac, crea l'archivio dell'ultimo commit (come `pnpm release`, si pubblica solo ciò che è committato):
+   ```bash
+   git archive --format=tar.gz -o vtt-nas.tar.gz HEAD
+   ```
+2. In File Station crea la cartella `docker/vtt`, carica l'archivio ed estrailo lì dentro (tasto destro → Estrai → Estrai qui).
+3. Container Manager → **Progetto** → **Crea**: nome `vtt`, percorso `docker/vtt`, sorgente "Usa docker-compose.yml esistente" → Avanti → Fine. Il primo build richiede qualche minuto.
+4. Apri `http://<IP-del-NAS>:8080`. I link per i giocatori usano lo stesso indirizzo.
+
+- I dati (SQLite + immagini) sono in `docker/vtt/data`, inclusi nei backup del NAS (Hyper Backup).
+- Il container riparte da solo dopo un riavvio del NAS (`restart: unless-stopped`).
+- **Aggiornare**: rifai i passi 1–2 sovrascrivendo i file (la cartella `data/` non viene toccata), poi Progetto `vtt` → Azione → **Build** (ricostruisce l'immagine e riavvia il container).
+- Porta occupata? Cambia la parte sinistra di `"8080:8080"` in `docker-compose.yml`.
+- Se il firewall del NAS è attivo, consenti la porta 8080 dalla rete locale (Pannello di controllo → Sicurezza → Firewall).
+- L'app non ha login: **non esporla su Internet** (niente port forwarding sul router). Da fuori casa usa la VPN del NAS o Tailscale.
+- Cronologia dal Mac: `pnpm history --url http://<IP-del-NAS>:8080 list` (stessi comandi di sotto).
+
 ## Più tab, sincronizzazione e cronologia
 
 - Ogni documento (PG, scena, combattimento, tiro) ha una **versione**. Un salvataggio dichiara la versione su cui si basa (`If-Match`): se nel frattempo un altro tab ha salvato, il server risponde `409` e **non sovrascrive**. Il tab scarica la versione nuova e riapplica sopra solo le proprie modifiche.

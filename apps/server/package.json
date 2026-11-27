@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "tsx watch --clear-screen=false src/index.ts",
     "start": "NODE_ENV=production tsx src/index.ts",
+    "bundle": "esbuild src/index.ts --bundle --platform=node --format=esm --target=node24 --outfile=dist/index.mjs \"--banner:js=import { createRequire } from 'node:module'; const require = createRequire(import.meta.url);\"",
     "typecheck": "tsc -p tsconfig.json"
   },
   "dependencies": {
@@ -16,6 +17,7 @@
     "zod": "^4.6.7"
   },
   "devDependencies": {
+    "esbuild": "^0.28.2",
     "tsx": "^4.23.15"
   }
 }
