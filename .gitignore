@@ -4,3 +4,4 @@ data/
 *.log
 .DS_Store
 coverage/
+vtt-nas.tar.gz
